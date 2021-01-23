@@ -65,9 +65,10 @@ public class PlayerMovement : MonoBehaviour
 		float directedFootOffset = footOffset * direction;
 		RaycastHit2D leftCheck = Raycast(new Vector2(-footDistance + directedFootOffset, 0f), Vector2.down, groundDistance);
         RaycastHit2D rightCheck = Raycast(new Vector2(footDistance + directedFootOffset, 0f), Vector2.down, groundDistance);
+		RaycastHit2D middleCheck = Raycast(new Vector2(directedFootOffset, 0f), Vector2.down, groundDistance);
 
 		// If either ray hit the ground, the player is on the ground
-		if (leftCheck || rightCheck)
+		if (leftCheck || middleCheck || rightCheck)
 			isOnGround = true;
 	}
 
