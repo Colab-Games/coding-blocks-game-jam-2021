@@ -17,7 +17,8 @@ public class PlayerMovement : MonoBehaviour
 	public float jumpHoldDuration = .1f;    // How long the jump key can be held
 
 	[Header("Environment Check Properties")]
-    public float footOffset = .4f;			// X Offset of feet raycast
+    public float footDistance = .4f;        // X Distance of feet raycast
+	public float footOffset = 0f;			// X Offset of feet raycast
     public float groundDistance = .2f;      // Distance player is considered to be on the ground
 	public LayerMask groundLayer;           // Layer of the ground
 
@@ -61,8 +62,9 @@ public class PlayerMovement : MonoBehaviour
         isOnGround = false;
 
 		// Cast rays for the left and right foot
-		RaycastHit2D leftCheck = Raycast(new Vector2(-footOffset, 0f), Vector2.down, groundDistance);
-        RaycastHit2D rightCheck = Raycast(new Vector2(footOffset, 0f), Vector2.down, groundDistance);
+		float directedFootOffset = footOffset * direction;
+		RaycastHit2D leftCheck = Raycast(new Vector2(-footDistance + directedFootOffset, 0f), Vector2.down, groundDistance);
+        RaycastHit2D rightCheck = Raycast(new Vector2(footDistance + directedFootOffset, 0f), Vector2.down, groundDistance);
 
 		// If either ray hit the ground, the player is on the ground
 		if (leftCheck || rightCheck)
@@ -116,7 +118,7 @@ public class PlayerMovement : MonoBehaviour
 	void UpdateAnimation()
     {
 		animator.SetFloat("Speed", Mathf.Abs(rigidBody.velocity.x));
-		animator.SetBool("IsJumping", isJumping || (rigidBody.velocity.y > 0f));
+		animator.SetBool("IsJumping", isJumping || (rigidBody.velocity.y > 0.1f));
 		animator.SetBool("IsOnGround", isOnGround);
 	}
 
