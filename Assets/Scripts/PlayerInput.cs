@@ -45,6 +45,9 @@ public class PlayerInput : MonoBehaviour
         float horizontal = Input.GetAxis("Horizontal");
         playerMovement.horizontalMovement = Mathf.Clamp(horizontal, -1f, 1f);
 
+        float vertical = Input.GetAxis("Vertical");
+        playerMovement.verticalMovement = Mathf.Clamp(vertical, -1f, 1f);
+
         // TODO: check if jump is enabled
         playerMovement.jump = playerMovement.jump || Input.GetButtonDown("Jump");
         playerMovement.boostJump = playerMovement.boostJump || Input.GetButton("Jump");
