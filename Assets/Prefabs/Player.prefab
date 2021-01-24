@@ -75,7 +75,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 486735491
-  m_SortingLayer: 3
+  m_SortingLayer: 7
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 219679ccefe78d7418e77cce02630bdf, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -180,6 +180,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   drawDebugRaycasts: 1
   speed: 10
+  climbSpeed: 6
   coyoteDuration: 0.1
   maxFallSpeed: -20
   jumpForce: 4
@@ -191,7 +192,11 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 1024
+  ladderLayer:
+    serializedVersion: 2
+    m_Bits: 16384
   horizontalMovement: 0
+  verticalMovement: 0
   jump: 0
   boostJump: 0
 --- !u!1 &2220882537497362436

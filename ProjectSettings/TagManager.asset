@@ -19,7 +19,7 @@ TagManager:
   - BackgroundDetails
   - BackgroundFill
   - 
-  - 
+  - Ladders
   - 
   - 
   - 
@@ -52,6 +52,9 @@ TagManager:
     locked: 0
   - name: Platforms
     uniqueID: 3462090667
+    locked: 0
+  - name: Interactables
+    uniqueID: 2462074031
     locked: 0
   - name: ForegroundDetails
     uniqueID: 758331015

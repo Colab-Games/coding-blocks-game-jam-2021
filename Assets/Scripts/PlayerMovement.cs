@@ -8,6 +8,7 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Movement Properties")]
     public float speed = 1f;                // Player speed
+    public float climbSpeed = 1f;           // Ladder climbing speed
     public float coyoteDuration = .05f;     // How long the player can jump after falling
     public float maxFallSpeed = -5f;        // Max speed player can fall
 
@@ -20,17 +21,24 @@ public class PlayerMovement : MonoBehaviour
     public float footDistance = .4f;        // X Distance of feet raycast
     public float footOffset = 0f;           // X Offset of feet raycast
     public float groundDistance = .2f;      // Distance player is considered to be on the ground
-    public LayerMask groundLayer;           // Layer of the ground
+    public LayerMask groundLayer;
+    public LayerMask ladderLayer;
 
     [HideInInspector] public float horizontalMovement;
+    [HideInInspector] public float verticalMovement;
     [HideInInspector] public bool jump;
     [HideInInspector] public bool boostJump;
 
     Rigidbody2D rigidBody;
+    BoxCollider2D boxCollider;
     Animator animator;
 
     bool isOnGround;
+    bool isInFrontOfGround;                 // Used to check if player can leave a ladder
     bool isJumping;
+    bool isInFrontOfLadder;
+    bool isAboveLadder;
+    bool isClimbing;
 
     float jumpTime;                         // Variable to hold jump duration
     float coyoteTime;                       // Variable to hold coyote duration
@@ -41,6 +49,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rigidBody = GetComponent<Rigidbody2D>();
+        boxCollider = GetComponent<BoxCollider2D>();
         animator = GetComponent<Animator>();
 
         originalXScale = transform.localScale.x;
@@ -58,8 +67,10 @@ public class PlayerMovement : MonoBehaviour
 
     void PhysicsCheck()
     {
-        // Start assuming the player isn't on the ground
         isOnGround = false;
+        isAboveLadder = false;
+        isInFrontOfLadder = false;
+        isInFrontOfGround = false;
 
         // Cast rays for the left and right foot
         float directedFootOffset = footOffset * direction;
@@ -70,10 +81,29 @@ public class PlayerMovement : MonoBehaviour
         // If either ray hit the ground, the player is on the ground
         if (leftCheck || middleCheck || rightCheck)
             isOnGround = true;
+
+        // Cast an horizontal ray for ladder check
+        RaycastHit2D ladderCheck = Raycast(new Vector2(footDistance + directedFootOffset, -groundDistance), Vector2.left, footDistance * 2, ladderLayer);
+        if (ladderCheck)
+            isAboveLadder = true;
+
+        // Check if is colliding with a ladder
+        isInFrontOfLadder = boxCollider.IsTouchingLayers(ladderLayer);
+
+        RaycastHit2D groundFrontCheck = Raycast(new Vector2(0f, 0f), Vector2.up, boxCollider.size.y);
+        if (groundFrontCheck)
+            isInFrontOfGround = true;
     }
 
     void GroundMovement()
     {
+        // Can't move if is in the middle of a ladder
+        if (isClimbing && isInFrontOfLadder && (!isOnGround || isInFrontOfGround))
+        {
+            rigidBody.velocity = new Vector2(0f, rigidBody.velocity.y);
+            return;
+        }
+
         float xVelocity = speed * horizontalMovement;
 
         // If the sign of the velocity and direction don't match, flip the character
@@ -85,10 +115,30 @@ public class PlayerMovement : MonoBehaviour
         // If the player is on the ground, extend the coyote time window
         if (isOnGround)
             coyoteTime = Time.time + coyoteDuration;
+
+        // If moved sideways stop climbing
+        if (isClimbing && xVelocity != 0f)
+            StopClimbing();
     }
 
     void MidAirMovement()
     {
+        float yVelocity = verticalMovement * climbSpeed;
+        if (yVelocity != 0f && !isClimbing && (isInFrontOfLadder || isAboveLadder))
+            StartClimbing();
+
+        if (isClimbing)
+        {
+            // If there is a ladder below the player can go downwards.
+            // If there the player is in front of a ladder the player can go upwards.
+            if ((yVelocity < 0f && (isAboveLadder || (!isOnGround && isInFrontOfLadder))) || (yVelocity > 0f && isInFrontOfLadder))
+                rigidBody.velocity = new Vector2(rigidBody.velocity.x, yVelocity);
+            else if (isInFrontOfLadder)
+                rigidBody.velocity = new Vector2(rigidBody.velocity.x, 0f);
+            else
+                StopClimbing();
+        }
+
         // If the player should jump AND the player isn't already jumping AND EITHER
         // the player is on the ground or within the coyote time window...
         if (jump && !isJumping && (isOnGround || coyoteTime > Time.time))
@@ -118,9 +168,11 @@ public class PlayerMovement : MonoBehaviour
 
     void UpdateAnimation()
     {
-        animator.SetFloat("Speed", Mathf.Abs(rigidBody.velocity.x));
-        animator.SetBool("IsJumping", isJumping || (rigidBody.velocity.y > 0.1f));
+        animator.SetFloat("HorizontalSpeed", Mathf.Abs(rigidBody.velocity.x));
+        animator.SetFloat("VerticalSpeed", Mathf.Abs(rigidBody.velocity.y));
+        animator.SetBool("IsJumping", isJumping);
         animator.SetBool("IsOnGround", isOnGround);
+        animator.SetBool("IsClimbing", isClimbing);
     }
 
     void FlipCharacterDirection()
@@ -136,6 +188,18 @@ public class PlayerMovement : MonoBehaviour
 
         // Apply the new scale
         transform.localScale = scale;
+    }
+
+    void StartClimbing()
+    {
+        isClimbing = true;
+        rigidBody.bodyType = RigidbodyType2D.Kinematic;
+    }
+
+    void StopClimbing()
+    {
+        isClimbing = false;
+        rigidBody.bodyType = RigidbodyType2D.Dynamic;
     }
 
 
