@@ -9,7 +9,7 @@ using UnityEngine;
 public class PlayerInput : MonoBehaviour
 {
     PlayerMovement playerMovement;  // The player movement controller 
-    bool readyToClear;			    //Bool used to keep input in sync
+    bool readyToClear;              // Bool used to keep input in sync
 
     void Start()
     {
