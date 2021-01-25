@@ -17,12 +17,17 @@ public class PlayerMovement : MonoBehaviour
     public float jumpHoldForce = .3f;       // Incremental force when jump is held
     public float jumpHoldDuration = .1f;    // How long the jump key can be held
 
+    [Header("Damage Properties")]
+    public float respawnTime = 1f;
+
     [Header("Environment Check Properties")]
     public float footDistance = .4f;        // X Distance of feet raycast
     public float footOffset = 0f;           // X Offset of feet raycast
     public float groundDistance = .2f;      // Distance player is considered to be on the ground
     public LayerMask groundLayer;
     public LayerMask ladderLayer;
+    public string checkpointTag;
+    public string hazardTag;
 
     [HideInInspector] public float horizontalMovement;
     [HideInInspector] public float verticalMovement;
@@ -32,7 +37,9 @@ public class PlayerMovement : MonoBehaviour
     Rigidbody2D rigidBody;
     BoxCollider2D boxCollider;
     Animator animator;
+    Vector2 respawnPosition;
 
+    bool isAlive;
     bool isOnGround;
     bool isInFrontOfGround;                 // Used to check if player can leave a ladder
     bool isJumping;
@@ -52,6 +59,9 @@ public class PlayerMovement : MonoBehaviour
         boxCollider = GetComponent<BoxCollider2D>();
         animator = GetComponent<Animator>();
 
+        respawnPosition = transform.position;
+        Respawn();
+
         originalXScale = transform.localScale.x;
     }
 
@@ -63,6 +73,15 @@ public class PlayerMovement : MonoBehaviour
         MidAirMovement();
 
         UpdateAnimation();
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == checkpointTag)
+            respawnPosition = collision.gameObject.transform.position;
+
+        if (collision.tag == hazardTag)
+            Die();
     }
 
     void PhysicsCheck()
@@ -97,6 +116,12 @@ public class PlayerMovement : MonoBehaviour
 
     void GroundMovement()
     {
+        if (!isAlive)
+        {
+            rigidBody.velocity = new Vector2(0f, rigidBody.velocity.y);
+            return;
+        }
+
         // Can't move if is in the middle of a ladder
         if (isClimbing && isInFrontOfLadder && (!isOnGround || isInFrontOfGround))
         {
@@ -123,6 +148,9 @@ public class PlayerMovement : MonoBehaviour
 
     void MidAirMovement()
     {
+        if (!isAlive)
+            return;
+
         float yVelocity = verticalMovement * climbSpeed;
         if (yVelocity != 0f && !isClimbing && (isInFrontOfLadder || isAboveLadder))
             StartClimbing();
@@ -173,6 +201,7 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("IsJumping", isJumping);
         animator.SetBool("IsOnGround", isOnGround);
         animator.SetBool("IsClimbing", isClimbing);
+        animator.SetBool("IsAlive", isAlive);
     }
 
     void FlipCharacterDirection()
@@ -200,6 +229,30 @@ public class PlayerMovement : MonoBehaviour
     {
         isClimbing = false;
         rigidBody.bodyType = RigidbodyType2D.Dynamic;
+    }
+
+    void Die()
+    {
+        if (isAlive)
+        {
+            isAlive = false;
+            StartCoroutine(RespawnTimer());
+        }
+    }
+
+    IEnumerator RespawnTimer()
+    {
+        yield return new WaitForSeconds(respawnTime);
+        Respawn();
+    }
+
+    void Respawn()
+    {
+        if (!isAlive)
+        {
+            isAlive = true;
+            transform.position = new Vector3(respawnPosition.x, respawnPosition.y, transform.position.z);
+        }
     }
 
 
