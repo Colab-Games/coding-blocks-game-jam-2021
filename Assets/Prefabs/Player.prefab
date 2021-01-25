@@ -186,6 +186,7 @@ MonoBehaviour:
   jumpForce: 4
   jumpHoldForce: 3
   jumpHoldDuration: 0.1
+  respawnTime: 0.3
   footDistance: 0.8
   footOffset: -0.07574373
   groundDistance: 0.2
@@ -195,6 +196,8 @@ MonoBehaviour:
   ladderLayer:
     serializedVersion: 2
     m_Bits: 16384
+  checkpointTag: Checkpoint
+  hazardTag: Hazard
   horizontalMovement: 0
   verticalMovement: 0
   jump: 0
