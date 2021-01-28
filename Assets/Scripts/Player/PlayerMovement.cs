@@ -26,6 +26,7 @@ public class PlayerMovement : MonoBehaviour
     public float groundDistance = .2f;      // Distance player is considered to be on the ground
     public LayerMask groundLayer;
     public LayerMask ladderLayer;
+    public LayerMask interactableLayer;
     public string checkpointTag;
     public string hazardTag;
 
@@ -33,6 +34,7 @@ public class PlayerMovement : MonoBehaviour
     [HideInInspector] public float verticalMovement;
     [HideInInspector] public bool jump;
     [HideInInspector] public bool boostJump;
+    [HideInInspector] public bool interact;
 
     Rigidbody2D rigidBody;
     BoxCollider2D boxCollider;
@@ -46,6 +48,7 @@ public class PlayerMovement : MonoBehaviour
     bool isInFrontOfLadder;
     bool isAboveLadder;
     bool isClimbing;
+    IInteractable interactable;             // The interactable in range to be interacted with
 
     float jumpTime;                         // Variable to hold jump duration
     float coyoteTime;                       // Variable to hold coyote duration
@@ -71,11 +74,12 @@ public class PlayerMovement : MonoBehaviour
 
         GroundMovement();
         MidAirMovement();
+        Interactions();
 
         UpdateAnimation();
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag == checkpointTag)
             respawnPosition = collision.gameObject.transform.position;
@@ -109,9 +113,25 @@ public class PlayerMovement : MonoBehaviour
         // Check if is colliding with a ladder
         isInFrontOfLadder = boxCollider.IsTouchingLayers(ladderLayer);
 
-        RaycastHit2D groundFrontCheck = Raycast(new Vector2(0f, 0f), Vector2.up, boxCollider.size.y);
-        if (groundFrontCheck)
+        RaycastHit2D[] groundFrontCheck = BoxCastAll(new Vector2(transform.position.x, transform.position.y) + boxCollider.offset, boxCollider.size, groundLayer);
+        if (groundFrontCheck.Length > 0)
             isInFrontOfGround = true;
+
+        // Check for interactables in range and get the closest
+        RaycastHit2D[] interactableHits = BoxCastAll(new Vector2(transform.position.x, transform.position.y) + boxCollider.offset, boxCollider.size, interactableLayer);
+        if (interactableHits.Length > 0)
+        {
+            List<GameObject> interactables = new List<GameObject>();
+            foreach (var hit in interactableHits)
+            {
+                IInteractable interactableHit = hit.collider.GetComponent<IInteractable>();
+                if (interactableHit != null && interactableHit.CanInteract(gameObject))
+                    interactables.Add(hit.collider.gameObject);
+            }
+            interactable = GetClosestGameObject(interactables.ToArray())?.GetComponent<IInteractable>();
+        }
+        else
+            interactable = null;
     }
 
     void GroundMovement()
@@ -152,7 +172,7 @@ public class PlayerMovement : MonoBehaviour
             return;
 
         float yVelocity = verticalMovement * climbSpeed;
-        if (yVelocity != 0f && !isClimbing && (isInFrontOfLadder || isAboveLadder))
+        if (GameManager.IsMechanicOperational(BreakableMechanic.Climb) && yVelocity != 0f && !isClimbing && (isInFrontOfLadder || isAboveLadder))
             StartClimbing();
 
         if (isClimbing)
@@ -167,9 +187,9 @@ public class PlayerMovement : MonoBehaviour
                 StopClimbing();
         }
 
-        // If the player should jump AND the player isn't already jumping AND EITHER
+        // If jump is enabled and the player should jump AND the player isn't already jumping AND EITHER
         // the player is on the ground or within the coyote time window...
-        if (jump && !isJumping && (isOnGround || coyoteTime > Time.time))
+        if (GameManager.IsMechanicOperational(BreakableMechanic.Jump) && jump && !isJumping && (isOnGround || coyoteTime > Time.time))
         {
             isOnGround = false;
             isJumping = true;
@@ -192,6 +212,14 @@ public class PlayerMovement : MonoBehaviour
         // If player is falling to fast, reduce the Y velocity to the max
         if (rigidBody.velocity.y < maxFallSpeed)
             rigidBody.velocity = new Vector2(rigidBody.velocity.x, maxFallSpeed);
+    }
+
+    void Interactions()
+    {
+        if (interact && interactable != null)
+        {
+            interactable.Interact(gameObject);
+        }
     }
 
     void UpdateAnimation()
@@ -255,6 +283,23 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    GameObject GetClosestGameObject(GameObject[] objects)
+    {
+        GameObject closestObject = null;
+        float closestObjectDist = Mathf.Infinity;
+        foreach (var obj in objects)
+        {
+            Vector2 directionToObject = (obj.transform.position - transform.position);
+            float distance = directionToObject.SqrMagnitude();
+            if (distance < closestObjectDist)
+            {
+                closestObject = obj;
+                closestObjectDist = distance;
+            }
+        }
+        return closestObject;
+    }
+
 
     // These two Raycast methods wrap the Physics2D.Raycast() and provide some extra
     // functionality
@@ -284,5 +329,23 @@ public class PlayerMovement : MonoBehaviour
 
         // Return the results of the raycast
         return hit;
+    }
+
+    RaycastHit2D[] BoxCastAll(Vector2 origin, Vector2 size, LayerMask mask)
+    {
+        RaycastHit2D[] hits = Physics2D.BoxCastAll(origin, size, 0, Vector2.zero, 0, mask);
+        if (drawDebugRaycasts)
+        {
+            Color color = hits.Length > 0 ? Color.red : Color.green;
+            Vector2 topLeft = (Vector2.left + Vector2.up) * size / 2;
+            Vector2 topRight = (Vector2.right + Vector2.up) * size / 2;
+            Vector2 bottomLeft = topRight * -1;
+            Vector2 bottomRight = topLeft * -1;
+            Debug.DrawRay(origin + topLeft, Vector2.right * size.x, color);
+            Debug.DrawRay(origin + topRight, Vector2.down * size.y, color);
+            Debug.DrawRay(origin + bottomRight, Vector2.left * size.x, color);
+            Debug.DrawRay(origin + bottomLeft, Vector2.up * size.y, color);
+        }
+        return hits;
     }
 }
