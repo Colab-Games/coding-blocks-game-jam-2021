@@ -29,6 +29,7 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask interactableLayer;
     public string checkpointTag;
     public string hazardTag;
+    public string movingPlatformTag;
 
     [HideInInspector] public float horizontalMovement;
     [HideInInspector] public float verticalMovement;
@@ -96,6 +97,7 @@ public class PlayerMovement : MonoBehaviour
         isAboveLadder = false;
         isInFrontOfLadder = false;
         isInFrontOfGround = false;
+        transform.parent = null;
 
         // Cast rays for the left and right foot
         float directedFootOffset = footOffset * direction;
@@ -105,7 +107,12 @@ public class PlayerMovement : MonoBehaviour
 
         // If either ray hit the ground, the player is on the ground
         if (leftCheck || middleCheck || rightCheck)
+        {
+            if (leftCheck.collider?.tag == movingPlatformTag) transform.parent = leftCheck.transform;
+            if (rightCheck.collider?.tag == movingPlatformTag) transform.parent = rightCheck.transform;
+            if (middleCheck.collider?.tag == movingPlatformTag) transform.parent = middleCheck.transform;
             isOnGround = true;
+        }
 
         // Cast an horizontal ray for ladder check
         RaycastHit2D ladderCheck = Raycast(new Vector2(footDistance + directedFootOffset, -groundDistance), Vector2.left, footDistance * 2, ladderLayer);
