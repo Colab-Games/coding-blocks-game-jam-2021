@@ -26,6 +26,7 @@ public class CircuitElement : MonoBehaviour, IInteractable
 
         circuit = MechanicCircuit.GetInstance(mechanic);
         circuit.elements.Add(this);
+        circuit.CheckCircuit();
     }
 
     public bool CanInteract(GameObject other)
