@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Hazard
   - Checkpoint
+  - Interactable
+  - MovingPlatform
   layers:
   - Default
   - TransparentFX
@@ -24,7 +26,7 @@ TagManager:
   - Ladders
   - Hazards
   - Checkpoint
-  - 
+  - Interactable
   - 
   - 
   - 

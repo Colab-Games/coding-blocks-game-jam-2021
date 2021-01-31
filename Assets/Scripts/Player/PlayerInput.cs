@@ -36,6 +36,7 @@ public class PlayerInput : MonoBehaviour
 
         playerMovement.jump = false;
         playerMovement.boostJump = false;
+        playerMovement.interact = false;
 
         readyToClear = false;
     }
@@ -48,8 +49,8 @@ public class PlayerInput : MonoBehaviour
         float vertical = Input.GetAxis("Vertical");
         playerMovement.verticalMovement = Mathf.Clamp(vertical, -1f, 1f);
 
-        // TODO: check if jump is enabled
         playerMovement.jump = playerMovement.jump || Input.GetButtonDown("Jump");
         playerMovement.boostJump = playerMovement.boostJump || Input.GetButton("Jump");
+        playerMovement.interact = playerMovement.interact || Input.GetButtonDown("Interact");
     }
 }

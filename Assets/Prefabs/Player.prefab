@@ -12,9 +12,11 @@ GameObject:
   - component: {fileID: 2220882536930881333}
   - component: {fileID: 2220882536930881335}
   - component: {fileID: 2220882536930881334}
-  - component: {fileID: 2220882536930881329}
+  - component: {fileID: 1292024444996415283}
+  - component: {fileID: 6546073440593558829}
   - component: {fileID: 2220882536930881331}
   - component: {fileID: 2220882536930881328}
+  - component: {fileID: 281565545551528745}
   m_Layer: 9
   m_Name: Player
   m_TagString: Untagged
@@ -128,7 +130,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!61 &2220882536930881329
+--- !u!61 &1292024444996415283
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -154,6 +156,22 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.3, y: 2.8}
   m_EdgeRadius: 0
+--- !u!70 &6546073440593558829
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2220882536930881290}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 6200000, guid: 9e06edf9598407b4b8a95b6fe1e9db3b, type: 2}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0.2, y: 0.10000001}
+  m_Size: {x: 1.5, y: 0.20000099}
+  m_Direction: 1
 --- !u!114 &2220882536930881331
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -196,12 +214,29 @@ MonoBehaviour:
   ladderLayer:
     serializedVersion: 2
     m_Bits: 16384
+  interactableLayer:
+    serializedVersion: 2
+    m_Bits: 131072
   checkpointTag: Checkpoint
   hazardTag: Hazard
+  movingPlatformTag: MovingPlatform
   horizontalMovement: 0
   verticalMovement: 0
   jump: 0
   boostJump: 0
+  interact: 0
+--- !u!114 &281565545551528745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2220882536930881290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d111d2883b86d6e4d91a361876a975c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2220882537497362436
 GameObject:
   m_ObjectHideFlags: 0
