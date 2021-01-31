@@ -14,4 +14,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/JumpScene.unity
     guid: 9cb27bc519556408583605bf5430e7ea
+  - enabled: 1
+    path: Assets/Scenes/ControlPanelScene.unity
+    guid: 3c0aa3309dadc46be84ae564a132f75c
+  - enabled: 1
+    path: Assets/Scenes/ClimbScene.unity
+    guid: 073aa403eca1c4ccb88d1be10c337b38
   m_configObjects: {}
