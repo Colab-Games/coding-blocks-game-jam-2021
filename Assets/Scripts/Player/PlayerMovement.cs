@@ -86,9 +86,11 @@ public class PlayerMovement : MonoBehaviour
             respawnPosition = collision.gameObject.transform.position;
 
         if (collision.tag == hazardTag)
+        {
             FindObjectOfType<AudioManager>().Play("PlayerDeath");
 
             Die();
+        }
     }
 
     void PhysicsCheck()

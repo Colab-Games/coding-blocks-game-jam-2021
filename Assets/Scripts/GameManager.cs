@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
     public static bool IsMechanicOperational(BreakableMechanic mechanic)
     {
         if (current == null)
-            return false;
+            return true;
         return current.operationalMechanics.Contains(mechanic);
     }
 }
