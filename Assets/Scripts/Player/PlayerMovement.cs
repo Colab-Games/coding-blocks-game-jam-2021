@@ -205,6 +205,8 @@ public class PlayerMovement : MonoBehaviour
             isOnGround = false;
             isJumping = true;
 
+            FindObjectOfType<AudioManager>().Play("PlayerJump");
+
             // Record the time the player will stop being able to boost their jump
             jumpTime = Time.time + jumpHoldDuration;
 

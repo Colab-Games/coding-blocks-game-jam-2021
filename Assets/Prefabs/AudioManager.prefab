@@ -45,7 +45,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sounds:
   - name: PlayerDeath
-    clip: {fileID: 8300000, guid: ea7321c7f0e5a49bf977e0f251ed8a3f, type: 3}
-    volume: 0.705
+    clip: {fileID: 8300000, guid: d96db9332f1ee485d9608dd0aafb9845, type: 3}
+    volume: 0.505
     pitch: 0.7
     source: {fileID: 0}
+    loop: 0
+  - name: PlayerJump
+    clip: {fileID: 8300000, guid: a1e19a41ceac24056b3ec621607a00a1, type: 3}
+    volume: 1
+    pitch: 1
+    source: {fileID: 0}
+    loop: 0
