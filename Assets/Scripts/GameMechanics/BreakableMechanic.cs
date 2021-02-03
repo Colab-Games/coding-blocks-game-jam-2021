@@ -10,4 +10,5 @@ public enum BreakableMechanic
 
     // Level mechanics
     MovablePlatform,
+    Lever,
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Activatable))]
 public class MovingPlatform : MonoBehaviour
 {
     public float speed = 0.06f;
@@ -16,6 +17,8 @@ public class MovingPlatform : MonoBehaviour
 
     Vector3 targetPosition;
 
+    Activatable activable;
+
     void OnDrawGizmos()
     {
         if (points != null)
@@ -29,6 +32,8 @@ public class MovingPlatform : MonoBehaviour
 
     void Start()
     {
+        activable = GetComponent<Activatable>();
+
         destinationIndex = 0;
         offset = new Vector2(transform.position.x, transform.position.y) - points[0];
         targetPosition = transform.position;
@@ -42,7 +47,7 @@ public class MovingPlatform : MonoBehaviour
     void Move()
     {
         transform.position = Vector3.Lerp(transform.position, targetPosition, lerpValue);
-        if (waitTime > Time.time || !GameManager.IsMechanicOperational(BreakableMechanic.MovablePlatform))
+        if (!GameManager.IsMechanicOperational(BreakableMechanic.MovablePlatform) || !activable.isActive || waitTime > Time.time)
             return;
 
         Vector2 destination = points[destinationIndex] + offset;
