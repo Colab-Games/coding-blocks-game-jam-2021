@@ -7,29 +7,20 @@ public class LevelGateway : MonoBehaviour
 {
     public string sceneName;
 
-    public LevelTransition animator;
+    public LevelTransition transition;
 
-    public string animationTrigger;
-    public float transitionTime = 1f;
+    public LevelTransition.Trigger animationTrigger;
+    public float animationSpeed = 1f;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
 
         if (other.tag == "Player")
         {
-            SceneManager.LoadScene(sceneName);
-
-            StartCoroutine(AnimateTransition(animationTrigger, transitionTime));
+            void callback() { SceneManager.LoadScene(sceneName); }
+            var animation = transition.AnimateTransition(animationTrigger, animationSpeed, callback);
+            StartCoroutine(animation);
         }
 
-    }
-
-    IEnumerator AnimateTransition(string animatorTrigger, float transitionTime)
-    {
-        // Play animation
-        animator.transition.SetTrigger(animatorTrigger);
-
-        // Wait
-        yield return new WaitForSeconds(transitionTime);
     }
 }
