@@ -18,7 +18,7 @@ public class PlayerMovement : MonoBehaviour
     public float jumpHoldDuration = .1f;    // How long the jump key can be held
 
     [Header("Damage Properties")]
-    public float respawnTime = 1f;
+    public float respawnTime = 5f;
 
     [Header("Environment Check Properties")]
     public float footDistance = .4f;        // X Distance of feet raycast
@@ -86,7 +86,11 @@ public class PlayerMovement : MonoBehaviour
             respawnPosition = collision.gameObject.transform.position;
 
         if (collision.tag == hazardTag)
+        {
+            FindObjectOfType<AudioManager>().Play("PlayerDeath");
+
             Die();
+        }
     }
 
     void PhysicsCheck()
@@ -200,6 +204,8 @@ public class PlayerMovement : MonoBehaviour
         {
             isOnGround = false;
             isJumping = true;
+
+            FindObjectOfType<AudioManager>().Play("PlayerJump");
 
             // Record the time the player will stop being able to boost their jump
             jumpTime = Time.time + jumpHoldDuration;

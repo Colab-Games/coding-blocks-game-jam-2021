@@ -48,8 +48,14 @@ TagManager:
   - name: BackgroundFill
     uniqueID: 1606972717
     locked: 0
+  - name: BackgroundFillMiddle
+    uniqueID: 4194226513
+    locked: 0
   - name: BackgroundFillFront
     uniqueID: 2756857175
+    locked: 0
+  - name: BackgroundFillFrontAux
+    uniqueID: 2719533059
     locked: 0
   - name: Background
     uniqueID: 3874541337
