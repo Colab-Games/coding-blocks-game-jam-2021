@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 {
     static GameManager current; // Singleton reference to GameManager
 
-    HashSet<BreakableMechanic> operationalMechanics;    // Set of mechanics which are operational
+    [SerializeField] List<BreakableMechanic> operationalMechanics = new List<BreakableMechanic>();  // Set of mechanics which are operational
 
     void Awake()
     {
@@ -18,26 +18,41 @@ public class GameManager : MonoBehaviour
         }
         current = this;
 
-        operationalMechanics = new HashSet<BreakableMechanic>();
-
         // Persist this object between scenes reloads
         DontDestroyOnLoad(gameObject);
     }
 
     public static void SetMechanicOperational(BreakableMechanic mechanic)
     {
-        current?.operationalMechanics.Add(mechanic);
+        current?.SetMechanicOperationalForInstance(mechanic);
     }
 
     public static void SetMechanicBroken(BreakableMechanic mechanic)
     {
-        current?.operationalMechanics.Remove(mechanic);
+        current?.SetMechanicOperationalForInstance(mechanic);
     }
 
     public static bool IsMechanicOperational(BreakableMechanic mechanic)
     {
         if (current == null)
-            return true;
-        return current.operationalMechanics.Contains(mechanic);
+            return false;
+        return current.IsMechanicOperationalForInstance(mechanic);
+    }
+
+    public void SetMechanicOperationalForInstance(BreakableMechanic mechanic)
+    {
+        if (!IsMechanicOperationalForInstance(mechanic))
+            operationalMechanics.Add(mechanic);
+    }
+
+    public void SetMechanicBrokenForInstance(BreakableMechanic mechanic)
+    {
+        while (IsMechanicOperationalForInstance(mechanic))
+            operationalMechanics.Remove(mechanic);
+    }
+
+    public bool IsMechanicOperationalForInstance(BreakableMechanic mechanic)
+    {
+        return operationalMechanics.Contains(mechanic);
     }
 }

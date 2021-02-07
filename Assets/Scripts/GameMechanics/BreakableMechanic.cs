@@ -9,6 +9,6 @@ public enum BreakableMechanic
     Climb,
 
     // Level mechanics
-    MovablePlatform,
+    MovingPlatforms,
     Lever,
 }

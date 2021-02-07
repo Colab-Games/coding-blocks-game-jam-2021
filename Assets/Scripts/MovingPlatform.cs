@@ -47,7 +47,7 @@ public class MovingPlatform : MonoBehaviour
     void Move()
     {
         transform.position = Vector3.Lerp(transform.position, targetPosition, lerpValue);
-        if (!GameManager.IsMechanicOperational(BreakableMechanic.MovablePlatform) || !activable.isActive || waitTime > Time.time)
+        if (!GameManager.IsMechanicOperational(BreakableMechanic.MovingPlatforms) || !activable.isActive || waitTime > Time.time)
             return;
 
         Vector2 destination = points[destinationIndex] + offset;
